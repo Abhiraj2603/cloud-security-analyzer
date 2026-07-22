@@ -29,13 +29,20 @@ def create_app():
     def load_user(user_id):
         return User.query.get(int(user_id))
 
+    # Authentication
     from app.auth.routes import auth_bp
     app.register_blueprint(auth_bp)
-    
+
+    # Dashboard
     from app.dashboard.routes import dashboard_bp
     app.register_blueprint(dashboard_bp)
-    
+
+    # API
     from app.api.routes import api_bp
     app.register_blueprint(api_bp)
-    
+
+    # Settings
+    from app.settings.routes import settings_bp
+    app.register_blueprint(settings_bp)
+
     return app

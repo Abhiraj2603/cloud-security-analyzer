@@ -1,114 +1,66 @@
 {% extends "base.html" %}
 
-{% block title %}Cloud Security Dashboard{% endblock %}
+{% block title %}Dashboard{% endblock %}
 
 {% block content %}
 
-<div class="container-fluid">
+<!-- Risk Banner -->
+<div class="row mb-4">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>☁️ Cloud Security Analyzer</h2>
+    <div class="col-lg-12">
 
-        <button id="scanButton" class="btn btn-primary btn-lg">
-            Scan AWS
-        </button>
-    </div>
+        <div class="card shadow-sm border-0">
 
-    <div id="status" class="alert alert-secondary">
-        Ready to scan.
-    </div>
+            <div class="card-body d-flex justify-content-between align-items-center">
 
-    <div class="row g-3">
+                <div>
 
-        <div class="col-md-2">
-            <div class="card text-center shadow-sm">
-                <div class="card-body">
-                    <h6>Security Groups</h6>
-                    <h2 id="total-sgs">0</h2>
+                    <h3 class="mb-1">
+                        Overall Risk Score
+                    </h3>
+
+                    <h2 id="riskScore" class="text-success">
+                        LOW
+                    </h2>
+
+                    <small class="text-muted">
+                        Last security scan summary
+                    </small>
+
                 </div>
-            </div>
-        </div>
 
-        <div class="col-md-2">
-            <div class="card text-center shadow-sm">
-                <div class="card-body">
-                    <h6>Findings</h6>
-                    <h2 id="total-findings">0</h2>
+                <div class="d-flex gap-2">
+
+                    <button
+                        id="scanBtn2"
+                        class="btn btn-primary btn-lg">
+
+                        <i class="bi bi-play-circle"></i>
+                        Scan AWS
+
+                    </button>
+
+                    <a
+                        href="/download/pdf"
+                        class="btn btn-danger btn-lg">
+
+                        <i class="bi bi-file-earmark-pdf"></i>
+                        PDF
+
+                    </a>
+
+                    <a
+                        href="/download/excel"
+                        class="btn btn-success btn-lg">
+
+                        <i class="bi bi-file-earmark-excel"></i>
+                        Excel
+
+                    </a>
+
                 </div>
+
             </div>
-        </div>
-
-        <div class="col-md-2">
-            <div class="card text-center shadow-sm">
-                <div class="card-body">
-                    <h6>Critical</h6>
-                    <h2 id="critical">0</h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-2">
-            <div class="card text-center shadow-sm">
-                <div class="card-body">
-                    <h6>High</h6>
-                    <h2 id="high">0</h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-2">
-            <div class="card text-center shadow-sm">
-                <div class="card-body">
-                    <h6>Medium</h6>
-                    <h2 id="medium">0</h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-2">
-            <div class="card text-center shadow-sm">
-                <div class="card-body">
-                    <h6>Low</h6>
-                    <h2 id="low">0</h2>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <div class="card shadow mt-4">
-
-        <div class="card-header">
-            Findings
-        </div>
-
-        <div class="card-body p-0">
-
-            <table class="table table-striped table-hover mb-0">
-
-                <thead class="table-dark">
-
-                <tr>
-                    <th>Severity</th>
-                    <th>Security Group</th>
-                    <th>Category</th>
-                    <th>Region</th>
-                    <th>Finding</th>
-                </tr>
-
-                </thead>
-
-                <tbody id="findings-table">
-
-                <tr>
-                    <td colspan="5" class="text-center">
-                        No scan executed.
-                    </td>
-                </tr>
-
-                </tbody>
-
-            </table>
 
         </div>
 
@@ -116,6 +68,149 @@
 
 </div>
 
-<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<!-- Summary Cards -->
+
+<div class="row g-3 mb-4">
+
+    <div class="col-md-2">
+        <div class="card stat-card">
+            <div class="card-body">
+                <h5>Security Groups</h5>
+                <h2 id="sgCount">0</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-2">
+        <div class="card stat-card">
+            <div class="card-body">
+                <h5>Findings</h5>
+                <h2 id="findingCount">0</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-2">
+        <div class="card stat-card critical">
+            <div class="card-body">
+                <h5>Critical</h5>
+                <h2 id="criticalCount">0</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-2">
+        <div class="card stat-card high">
+            <div class="card-body">
+                <h5>High</h5>
+                <h2 id="highCount">0</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-2">
+        <div class="card stat-card medium">
+            <div class="card-body">
+                <h5>Medium</h5>
+                <h2 id="mediumCount">0</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-2">
+        <div class="card stat-card low">
+            <div class="card-body">
+                <h5>Low</h5>
+                <h2 id="lowCount">0</h2>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Charts -->
+
+<div class="row mb-4">
+
+    <div class="col-lg-6">
+
+        <div class="card shadow-sm">
+
+            <div class="card-header">
+                Severity Distribution
+            </div>
+
+            <div class="card-body">
+                <canvas id="severityChart"></canvas>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-6">
+
+        <div class="card shadow-sm">
+
+            <div class="card-header">
+                Findings by Category
+            </div>
+
+            <div class="card-body">
+                <canvas id="categoryChart"></canvas>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Findings -->
+
+<div class="card shadow-sm">
+
+    <div class="card-header d-flex justify-content-between align-items-center">
+
+        <h5 class="mb-0">
+            Security Findings
+        </h5>
+
+        <input
+            type="text"
+            id="searchBox"
+            class="form-control w-25"
+            placeholder="Search findings">
+
+    </div>
+
+    <div class="table-responsive">
+
+        <table
+            class="table table-hover align-middle mb-0"
+            id="findingsTable">
+
+            <thead class="table-light">
+
+                <tr>
+                    <th>Severity</th>
+                    <th>Security Group / Resource</th>
+                    <th>Category</th>
+                    <th>Region</th>
+                    <th>Finding</th>
+                    <th>Recommendation</th>
+                </tr>
+
+            </thead>
+
+            <tbody id="findingsBody">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
 
 {% endblock %}

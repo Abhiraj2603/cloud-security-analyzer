@@ -1,6 +1,6 @@
 # AWS Security Group Risk Report
 
-Generated: 2026-07-21 23:59 UTC
+Generated: 2026-07-22 17:44 UTC
 Account: 459858401338
 Regions scanned: us-east-1
 

@@ -2,6 +2,8 @@ from app import create_app
 
 app = create_app()
 
+app.secret_key = "CloudSecurityAnalyzer@2026"
+
 if __name__ == "__main__":
 
     app.run(

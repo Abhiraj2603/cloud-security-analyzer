@@ -27,3 +27,8 @@ logs/
 
 # PyCharm
 .idea/
+# Log files
+*.log
+
+# Test files (optional)
+test_*.py

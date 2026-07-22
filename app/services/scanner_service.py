@@ -3,10 +3,13 @@ import os
 import subprocess
 import sys
 
+from app.scanner.iam_scanner import IAMScanner
+
 
 def run_scan():
     """
-    Execute the AWS Security Group scanner.
+    Execute the AWS Security Group scanner and IAM scanner,
+    then merge the findings.
     """
 
     scanner = os.path.abspath(
@@ -21,7 +24,7 @@ def run_scan():
     output_file = "/tmp/aws_scan.json"
 
     cmd = [
-        sys.executable,          # Use the same Python interpreter as Flask
+        sys.executable,  # Use the same Python interpreter as Flask
         scanner,
         "--json",
         output_file,
@@ -49,6 +52,21 @@ def run_scan():
 
     with open(output_file) as f:
         data = json.load(f)
+
+    # Ensure findings key exists
+    if "findings" not in data:
+        data["findings"] = []
+
+    # Run IAM Scanner
+    try:
+        iam_scanner = IAMScanner()
+        iam_findings = iam_scanner.scan()
+
+        if iam_findings:
+            data["findings"].extend(iam_findings)
+
+    except Exception as e:
+        print(f"IAM Scanner Error: {e}")
 
     return {
         "success": True,

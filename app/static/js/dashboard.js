@@ -1,89 +1,289 @@
+// Global chart variables
+let severityChart = null;
+let categoryChart = null;
+
+// ----------------------------
+// Scan Button
+// ----------------------------
 document.addEventListener("DOMContentLoaded", () => {
 
-    const button = document.getElementById("scanButton");
-    const status = document.getElementById("status");
+    const btn1 = document.getElementById("scanBtn");
+    const btn2 = document.getElementById("scanBtn2");
 
-    button.addEventListener("click", async () => {
+    if (btn1) btn1.addEventListener("click", startScan);
+    if (btn2) btn2.addEventListener("click", startScan);
 
-        button.disabled = true;
-        button.innerHTML = "Scanning...";
+});
 
-        status.className = "alert alert-info";
-        status.innerHTML = "Scanning AWS...";
+// ----------------------------
+// Main Scan Function
+// ----------------------------
 
-        try {
+async function startScan(){
 
-            const response = await fetch("/api/scan", {
-                method: "POST"
-            });
+    const buttons = document.querySelectorAll("#scanBtn,#scanBtn2");
 
-            const result = await response.json();
+    buttons.forEach(btn=>{
+        btn.disabled=true;
+        btn.innerHTML='<span class="spinner-border spinner-border-sm"></span> Scanning...';
+    });
 
-            if (!result.success) {
+    try{
 
-                status.className = "alert alert-danger";
-                status.innerHTML = result.error;
+        const response = await fetch("/api/scan",{
+            method:"POST"
+        });
 
-                button.disabled = false;
-                button.innerHTML = "Scan AWS";
+        const result = await response.json();
 
-                return;
-            }
+        if(result.success){
 
-            const summary = result.data.summary;
+            updateDashboard(result.data);
 
-            document.getElementById("total-sgs").innerHTML =
-                summary.total_sgs;
+            document.getElementById("lastScan").innerText =
+                new Date().toLocaleString();
 
-            document.getElementById("total-findings").innerHTML =
-                summary.total_findings;
+        }else{
 
-            document.getElementById("critical").innerHTML =
-                summary.by_severity.CRITICAL || 0;
-
-            document.getElementById("high").innerHTML =
-                summary.by_severity.HIGH || 0;
-
-            document.getElementById("medium").innerHTML =
-                summary.by_severity.MEDIUM || 0;
-
-            document.getElementById("low").innerHTML =
-                summary.by_severity.LOW || 0;
-
-            const tbody =
-                document.getElementById("findings-table");
-
-            tbody.innerHTML = "";
-
-            result.data.findings.forEach(finding => {
-
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${finding.severity}</td>
-                        <td>${finding.sg_name}</td>
-                        <td>${finding.category}</td>
-                        <td>${finding.region}</td>
-                        <td>${finding.title}</td>
-                    </tr>
-                `;
-
-            });
-
-            status.className = "alert alert-success";
-            status.innerHTML = "Scan completed successfully.";
+            alert(result.error || "Scan failed");
 
         }
 
-        catch (err) {
+    }catch(err){
 
-            status.className = "alert alert-danger";
-            status.innerHTML = err;
+        console.error(err);
 
+        alert("Unable to connect to backend.");
+
+    }
+
+    buttons.forEach(btn=>{
+        btn.disabled=false;
+        btn.innerHTML='<i class="bi bi-play-circle"></i> Scan AWS';
+    });
+
+}
+
+// ----------------------------
+// Update Dashboard
+// ----------------------------
+
+function updateDashboard(data){
+
+    const summary = data.summary;
+
+    document.getElementById("sgCount").innerText =
+        summary.total_sgs || 0;
+
+    document.getElementById("findingCount").innerText =
+        summary.total_findings || 0;
+
+    document.getElementById("criticalCount").innerText =
+        summary.CRITICAL || 0;
+
+    document.getElementById("highCount").innerText =
+        summary.HIGH || 0;
+
+    document.getElementById("mediumCount").innerText =
+        summary.MEDIUM || 0;
+
+    document.getElementById("lowCount").innerText =
+        summary.LOW || 0;
+
+    updateRisk(summary);
+
+    populateTable(data.findings);
+
+    drawCharts(summary,data.findings);
+
+}
+
+// ----------------------------
+// Risk
+// ----------------------------
+
+function updateRisk(summary){
+
+    let score="LOW";
+    let cls="text-success";
+
+    if((summary.CRITICAL||0)>0){
+
+        score="CRITICAL";
+        cls="text-danger";
+
+    }else if((summary.HIGH||0)>0){
+
+        score="HIGH";
+        cls="text-warning";
+
+    }else if((summary.MEDIUM||0)>0){
+
+        score="MEDIUM";
+        cls="text-primary";
+
+    }
+
+    const risk=document.getElementById("riskScore");
+
+    risk.innerText=score;
+    risk.className=cls;
+
+}
+
+// ----------------------------
+// Table
+// ----------------------------
+
+function populateTable(findings){
+
+    const tbody = document.getElementById("findingsBody");
+
+    tbody.innerHTML = "";
+
+    findings.forEach(f => {
+
+        let badge = "";
+
+        switch (f.severity){
+
+            case "CRITICAL":
+                badge = '<span class="badge bg-danger">CRITICAL</span>';
+                break;
+
+            case "HIGH":
+                badge = '<span class="badge bg-warning text-dark">HIGH</span>';
+                break;
+
+            case "MEDIUM":
+                badge = '<span class="badge bg-info text-dark">MEDIUM</span>';
+                break;
+
+            default:
+                badge = '<span class="badge bg-success">LOW</span>';
         }
 
-        button.disabled = false;
-        button.innerHTML = "Scan AWS";
+        tbody.innerHTML += `
+        <tr>
+
+            <td>${badge}</td>
+
+            <td>${f.sg_name || "-"}</td>
+
+            <td>${f.category || "-"}</td>
+
+            <td>${f.region || "-"}</td>
+
+            <td>${f.title || "-"}</td>
+
+            <td>${f.remediation || "-"}</td>
+
+        </tr>
+        `;
 
     });
 
+}
+
+// ----------------------------
+// Charts
+// ----------------------------
+
+function drawCharts(summary,findings){
+
+    // Severity
+
+    const sevCtx=document.getElementById("severityChart");
+
+    if(severityChart){
+
+        severityChart.destroy();
+
+    }
+
+    severityChart=new Chart(sevCtx,{
+
+        type:"doughnut",
+
+        data:{
+
+            labels:["Critical","High","Medium","Low"],
+
+            datasets:[{
+
+                data:[
+                    summary.CRITICAL||0,
+                    summary.HIGH||0,
+                    summary.MEDIUM||0,
+                    summary.LOW||0
+                ]
+
+            }]
+
+        }
+
+    });
+
+    // Category
+
+    const categories={};
+
+    findings.forEach(f=>{
+
+        categories[f.category]=(categories[f.category]||0)+1;
+
+    });
+
+    const catCtx=document.getElementById("categoryChart");
+
+    if(categoryChart){
+
+        categoryChart.destroy();
+
+    }
+
+    categoryChart=new Chart(catCtx,{
+
+        type:"bar",
+
+        data:{
+
+            labels:Object.keys(categories),
+
+            datasets:[{
+
+                label:"Findings",
+
+                data:Object.values(categories)
+
+            }]
+
+        }
+
+    });
+
+}
+
+// ----------------------------
+// Search
+// ----------------------------
+
+const search=document.getElementById("searchBox");
+
+if(search){
+
+search.addEventListener("keyup",function(){
+
+const filter=this.value.toLowerCase();
+
+const rows=document.querySelectorAll("#findingsBody tr");
+
+rows.forEach(r=>{
+
+r.style.display=r.innerText.toLowerCase().includes(filter)?"":"none";
+
 });
+
+});
+
+}
