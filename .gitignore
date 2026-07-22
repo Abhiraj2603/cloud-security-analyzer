@@ -1,34 +1,17 @@
-# Python
-__pycache__/
-*.py[cod]
-*.pyo
-*.pyd
-
-# Virtual Environment
 venv/
+__pycache__/
+*.pyc
 
-# Flask
-instance/
-*.db
-
-# Reports
-reports/
-uploads/
-logs/
-
-# Environment
 .env
 
-# VS Code
+/tmp/
+/logs/
+
+.aws/
+
 .vscode/
-
-# macOS
-.DS_Store
-
-# PyCharm
 .idea/
-# Log files
+
 *.log
 
-# Test files (optional)
-test_*.py
+.DS_Store

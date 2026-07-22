@@ -1,0 +1,67 @@
+# Cloud Security Analyzer with AI
+
+An AI-powered AWS Cloud Security Analyzer built with Flask, Boto3, Bootstrap, and Ollama.
+
+## Features
+
+- AWS Security Group Scanner
+- IAM Scanner
+- AI Security Assessment (Ollama)
+- Dashboard
+- Charts
+- PDF Report
+- Excel Report
+
+## Requirements
+
+- Python 3
+- AWS CLI
+- Ollama
+
+## Installation
+
+```bash
+git clone https://github.com/Abhiraj2603/cloud-security-analyzer.git
+
+cd cloud-security-analyzer
+
+chmod +x *.sh
+
+./install.sh
+```
+
+## Start Application
+
+```bash
+./start.sh
+```
+
+## Stop Application
+
+```bash
+./stop.sh
+```
+
+## Open
+
+```
+http://127.0.0.1:5000
+```
+
+## AWS Authentication
+
+Configure credentials:
+
+```bash
+aws configure
+```
+
+or use an EC2 IAM Role.
+
+## AI
+
+Uses the local Ollama model:
+
+```
+llama3.2
+```
