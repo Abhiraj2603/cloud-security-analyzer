@@ -94,7 +94,15 @@ function updateDashboard(data){
 
     populateTable(data.findings);
 
-    drawCharts(summary,data.findings);
+    drawCharts(summary, data.findings);
+
+    // Display AI Security Assessment
+    const aiSummary = document.getElementById("aiSummary");
+
+    if (aiSummary) {
+        aiSummary.innerText =
+            data.ai_summary || "No AI security assessment available.";
+    }
 
 }
 
