@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Cloud Security Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>☁️ Cloud Security Analyzer</h2>
+
+        <button id="scanButton" class="btn btn-primary btn-lg">
+            Scan AWS
+        </button>
+    </div>
+
+    <div id="status" class="alert alert-secondary">
+        Ready to scan.
+    </div>
+
+    <div class="row g-3">
+
+        <div class="col-md-2">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h6>Security Groups</h6>
+                    <h2 id="total-sgs">0</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h6>Findings</h6>
+                    <h2 id="total-findings">0</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h6>Critical</h6>
+                    <h2 id="critical">0</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h6>High</h6>
+                    <h2 id="high">0</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h6>Medium</h6>
+                    <h2 id="medium">0</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h6>Low</h6>
+                    <h2 id="low">0</h2>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card shadow mt-4">
+
+        <div class="card-header">
+            Findings
+        </div>
+
+        <div class="card-body p-0">
+
+            <table class="table table-striped table-hover mb-0">
+
+                <thead class="table-dark">
+
+                <tr>
+                    <th>Severity</th>
+                    <th>Security Group</th>
+                    <th>Category</th>
+                    <th>Region</th>
+                    <th>Finding</th>
+                </tr>
+
+                </thead>
+
+                <tbody id="findings-table">
+
+                <tr>
+                    <td colspan="5" class="text-center">
+                        No scan executed.
+                    </td>
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+
+{% endblock %}

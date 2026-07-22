@@ -1,8 +1,29 @@
-venv/
+# Python
 __pycache__/
-*.pyc
-instance/app.db
-.env
-logs/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual Environment
+venv/
+
+# Flask
+instance/
+*.db
+
+# Reports
 reports/
 uploads/
+logs/
+
+# Environment
+.env
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# PyCharm
+.idea/
