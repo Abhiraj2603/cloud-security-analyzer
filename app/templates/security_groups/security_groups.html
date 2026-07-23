@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+
+{% block title %}Security Groups{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Security Groups</h2>
+
+        <button class="btn btn-primary" onclick="loadFindings()">
+            <i class="bi bi-arrow-clockwise"></i>
+            Refresh
+        </button>
+    </div>
+
+    <!-- Summary Cards -->
+
+    <div class="row mb-4">
+
+        <div class="col-md-3">
+            <div class="card shadow-sm text-center">
+                <div class="card-body">
+                    <h6>Total Findings</h6>
+                    <h2 id="totalFindings">0</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card shadow-sm text-center">
+                <div class="card-body">
+                    <h6>Critical</h6>
+                    <h2 class="text-danger" id="criticalCount">0</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card shadow-sm text-center">
+                <div class="card-body">
+                    <h6>High</h6>
+                    <h2 class="text-warning" id="highCount">0</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card shadow-sm text-center">
+                <div class="card-body">
+                    <h6>Medium</h6>
+                    <h2 class="text-primary" id="mediumCount">0</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm text-center">
+                <div class="card-body">
+                    <h6>Low</h6>
+                    <h2 class="text-success" id="lowCount">0</h2>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Search -->
+
+    <div class="mb-3">
+
+        <input
+            id="searchBox"
+            class="form-control"
+            placeholder="Search Security Groups..."
+            onkeyup="filterTable()">
+
+    </div>
+
+    <!-- Findings Table -->
+
+    <div class="card shadow-sm">
+
+        <div class="card-header">
+            <strong>Security Findings</strong>
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="table table-hover table-striped mb-0" id="sgTable">
+
+                <thead class="table-dark">
+
+                <tr>
+
+                    <th>Severity</th>
+                    <th>Security Group</th>
+                    <th>Finding</th>
+                    <th>Category</th>
+                    <th>Region</th>
+                    <th>Recommendation</th>
+
+                </tr>
+
+                </thead>
+
+                <tbody>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+let findings=[];
+
+async function loadFindings(){
+
+    const response=await fetch("/api/security-groups");
+    const data=await response.json();
+
+    findings=data.findings;
+
+    renderTable(findings);
+
+}
+
+function badge(severity){
+
+    switch(severity){
+
+        case "CRITICAL":
+            return '<span class="badge bg-danger">CRITICAL</span>';
+
+        case "HIGH":
+            return '<span class="badge bg-warning text-dark">HIGH</span>';
+
+        case "MEDIUM":
+            return '<span class="badge bg-primary">MEDIUM</span>';
+
+        case "LOW":
+            return '<span class="badge bg-success">LOW</span>';
+
+        default:
+            return '<span class="badge bg-secondary">'+severity+'</span>';
+
+    }
+
+}
+
+function renderTable(data){
+
+    document.getElementById("totalFindings").innerText=data.length;
+
+    document.getElementById("criticalCount").innerText=
+        data.filter(x=>x.severity==="CRITICAL").length;
+
+    document.getElementById("highCount").innerText=
+        data.filter(x=>x.severity==="HIGH").length;
+
+    document.getElementById("mediumCount").innerText=
+        data.filter(x=>x.severity==="MEDIUM").length;
+
+    document.getElementById("lowCount").innerText=
+        data.filter(x=>x.severity==="LOW").length;
+
+    const tbody=document.querySelector("#sgTable tbody");
+
+    tbody.innerHTML="";
+
+    data.forEach(f=>{
+
+        tbody.innerHTML+=`
+
+        <tr>
+
+            <td>${badge(f.severity)}</td>
+
+            <td>${f.sg_name}</td>
+
+            <td>${f.title}</td>
+
+            <td>${f.category}</td>
+
+            <td>${f.region}</td>
+
+            <td>${f.remediation}</td>
+
+        </tr>
+
+        `;
+
+    });
+
+}
+
+function filterTable(){
+
+    const value=document
+        .getElementById("searchBox")
+        .value
+        .toLowerCase();
+
+    const filtered=findings.filter(f=>
+
+        f.sg_name.toLowerCase().includes(value) ||
+
+        f.title.toLowerCase().includes(value) ||
+
+        f.category.toLowerCase().includes(value) ||
+
+        f.severity.toLowerCase().includes(value)
+
+    );
+
+    renderTable(filtered);
+
+}
+
+loadFindings();
+
+</script>
+
+{% endblock %}

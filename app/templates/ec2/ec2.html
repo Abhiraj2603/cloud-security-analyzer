@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}EC2 Inventory{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>EC2 Inventory</h2>
+
+        <button class="btn btn-primary" onclick="loadInventory()">
+            <i class="bi bi-arrow-clockwise"></i>
+            Refresh
+        </button>
+    </div>
+
+    <!-- Summary Cards -->
+
+    <div class="row mb-4">
+
+        <div class="col-md-3">
+            <div class="card shadow-sm text-center">
+                <div class="card-body">
+                    <h6>Total Instances</h6>
+                    <h2 id="totalInstances">0</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm text-center">
+                <div class="card-body">
+                    <h6>Running</h6>
+                    <h2 class="text-success" id="runningInstances">0</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm text-center">
+                <div class="card-body">
+                    <h6>Stopped</h6>
+                    <h2 class="text-danger" id="stoppedInstances">0</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm text-center">
+                <div class="card-body">
+                    <h6>Public IPs</h6>
+                    <h2 id="publicIPs">0</h2>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Search -->
+
+    <div class="mb-3">
+
+        <input
+            class="form-control"
+            id="searchBox"
+            placeholder="Search instance..."
+            onkeyup="filterTable()">
+
+    </div>
+
+    <!-- Inventory -->
+
+    <div class="card shadow-sm">
+
+        <div class="card-header">
+
+            <strong>EC2 Inventory</strong>
+
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="table table-hover table-striped mb-0" id="inventoryTable">
+
+                <thead class="table-dark">
+
+                <tr>
+
+                    <th>Name</th>
+                    <th>Instance ID</th>
+                    <th>Status</th>
+                    <th>Type</th>
+                    <th>Platform</th>
+                    <th>Private IP</th>
+                    <th>Public IP</th>
+                    <th>IAM</th>
+                    <th>AZ</th>
+
+                </tr>
+
+                </thead>
+
+                <tbody>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+let inventory = [];
+
+async function loadInventory() {
+
+    const response = await fetch("/api/ec2");
+    const data = await response.json();
+
+    inventory = data.instances;
+
+    renderTable(inventory);
+
+}
+
+function renderTable(data){
+
+    document.getElementById("totalInstances").innerText = data.length;
+
+    document.getElementById("runningInstances").innerText =
+        data.filter(i=>i.state==="running").length;
+
+    document.getElementById("stoppedInstances").innerText =
+        data.filter(i=>i.state==="stopped").length;
+
+    document.getElementById("publicIPs").innerText =
+        data.filter(i=>i.public_ip!=="-").length;
+
+    const tbody=document.querySelector("#inventoryTable tbody");
+
+    tbody.innerHTML="";
+
+    data.forEach(instance=>{
+
+        const badge=
+            instance.state==="running"
+            ?'<span class="badge bg-success">Running</span>'
+            :'<span class="badge bg-danger">Stopped</span>';
+
+        tbody.innerHTML+=`
+        <tr>
+
+            <td>${instance.name}</td>
+
+            <td>
+                <code>${instance.instance_id}</code>
+            </td>
+
+            <td>${badge}</td>
+
+            <td>${instance.instance_type}</td>
+
+            <td>${instance.platform}</td>
+
+            <td>${instance.private_ip}</td>
+
+            <td>${instance.public_ip}</td>
+
+            <td>${instance.iam_role}</td>
+
+            <td>${instance.availability_zone}</td>
+
+        </tr>
+        `;
+
+    });
+
+}
+
+function filterTable(){
+
+    const value=document
+        .getElementById("searchBox")
+        .value
+        .toLowerCase();
+
+    const filtered=inventory.filter(instance=>
+
+        instance.name.toLowerCase().includes(value) ||
+
+        instance.instance_id.toLowerCase().includes(value) ||
+
+        instance.state.toLowerCase().includes(value)
+
+    );
+
+    renderTable(filtered);
+
+}
+
+loadInventory();
+
+</script>
+
+{% endblock %}

@@ -4,20 +4,33 @@ import boto3
 class EC2Scanner:
 
     def __init__(self):
-        self.session = boto3.Session(region_name="us-east-1")
-        self.ec2 = self.session.client("ec2")
+        self.session = boto3.Session()
         self.ec2 = self.session.client("ec2")
         self.findings = []
 
     def scan(self):
         paginator = self.ec2.get_paginator("describe_instances")
 
+        instances_found = 0
+
         for page in paginator.paginate():
             for reservation in page["Reservations"]:
                 for instance in reservation["Instances"]:
+                    instances_found += 1
+
+                    print("=" * 60)
+                    print("Instance ID :", instance["InstanceId"])
+                    print("State       :", instance["State"]["Name"])
+                    print("Public IP   :", instance.get("PublicIpAddress"))
+                    print("IAM Role    :", "IamInstanceProfile" in instance)
+                    print("Tags        :", instance.get("Tags", []))
+
                     self.check_public_ip(instance)
                     self.check_missing_name_tag(instance)
                     self.check_missing_iam_role(instance)
+
+        print(f"\nInstances Found: {instances_found}")
+        print(f"Findings Found : {len(self.findings)}")
 
         return self.findings
 
@@ -91,4 +104,4 @@ class EC2Scanner:
                 "No IAM Role Attached",
                 f"Instance {instance['InstanceId']} has no IAM role.",
                 "Attach an IAM Instance Profile.",
-            )
+                )

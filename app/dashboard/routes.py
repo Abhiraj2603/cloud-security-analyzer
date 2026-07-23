@@ -1,5 +1,3 @@
-from io import BytesIO
-
 from flask import (
     Blueprint,
     render_template,
@@ -10,7 +8,7 @@ from flask import (
 )
 
 from app.services.scanner_service import run_scan
-from app.services.pdf_service import generate_pdf
+from app.services.pdf_service import PDFService
 from app.services.excel_service import generate_excel
 
 dashboard_bp = Blueprint(
@@ -48,10 +46,10 @@ def download_pdf():
     if not result["success"]:
         return "Scan Failed", 500
 
-    pdf = generate_pdf(result["data"])
+    pdf = PDFService.generate_report(result["data"])
 
     return send_file(
-        BytesIO(pdf),
+        pdf,
         mimetype="application/pdf",
         as_attachment=True,
         download_name="Cloud_Security_Report.pdf",

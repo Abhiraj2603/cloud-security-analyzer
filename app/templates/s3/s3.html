@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}S3 Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2 class="fw-bold">
+                <i class="bi bi-bucket-fill text-primary"></i>
+                Amazon S3 Dashboard
+            </h2>
+
+            <p class="text-muted mb-0">
+                Analyze S3 buckets for security best practices.
+            </p>
+        </div>
+
+        <button class="btn btn-primary" id="refreshBtn">
+            <i class="bi bi-arrow-clockwise"></i>
+            Refresh
+        </button>
+
+    </div>
+
+    <!-- Summary Cards -->
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-lg-3">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted">
+                        Total Buckets
+                    </h6>
+
+                    <h2 id="totalBuckets">0</h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted">
+                        Public Buckets
+                    </h6>
+
+                    <h2 class="text-danger" id="publicBuckets">0</h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted">
+                        Encrypted
+                    </h6>
+
+                    <h2 class="text-success" id="encryptedBuckets">0</h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted">
+                        Findings
+                    </h6>
+
+                    <h2 class="text-warning" id="totalFindings">0</h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Bucket Inventory -->
+
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header bg-white">
+
+            <div class="d-flex justify-content-between">
+
+                <h5 class="mb-0">
+                    Bucket Inventory
+                </h5>
+
+                <input
+                    type="text"
+                    class="form-control w-25"
+                    placeholder="Search bucket..."
+                    id="searchInput">
+
+            </div>
+
+        </div>
+
+        <div class="card-body p-0">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+
+                    <tr>
+
+                        <th>Name</th>
+                        <th>Public</th>
+                        <th>Encryption</th>
+                        <th>Versioning</th>
+                        <th>Logging</th>
+                        <th>Lifecycle</th>
+
+                    </tr>
+
+                    </thead>
+
+                    <tbody id="inventoryTable">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Findings -->
+
+    <div class="card shadow-sm">
+
+        <div class="card-header bg-white">
+
+            <h5 class="mb-0">
+
+                Security Findings
+
+            </h5>
+
+        </div>
+
+        <div class="card-body p-0">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover mb-0">
+
+                    <thead class="table-light">
+
+                    <tr>
+
+                        <th>Severity</th>
+                        <th>Category</th>
+                        <th>Bucket</th>
+                        <th>Description</th>
+                        <th>Recommendation</th>
+
+                    </tr>
+
+                    </thead>
+
+                    <tbody id="findingsTable">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script src="{{ url_for('static', filename='js/s3.js') }}"></script>
+
+{% endblock %}

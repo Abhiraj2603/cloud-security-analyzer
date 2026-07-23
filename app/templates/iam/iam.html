@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}IAM Security{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold">
+            <i class="bi bi-person-badge-fill"></i>
+            IAM Security Dashboard
+        </h2>
+        <p class="text-muted mb-0">
+            Monitor IAM users, roles, MFA status and security findings.
+        </p>
+    </div>
+
+    <button class="btn btn-primary" id="refreshBtn">
+        <i class="bi bi-arrow-clockwise"></i>
+        Refresh
+    </button>
+</div>
+
+<!-- Summary Cards -->
+
+<div class="row g-3 mb-4">
+
+    <div class="col-lg-3 col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <h6>Total Users</h6>
+                <h2 id="totalUsers">0</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <h6>Total Roles</h6>
+                <h2 id="totalRoles">0</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <h6>Total Groups</h6>
+                <h2 id="totalGroups">0</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <h6>Total Findings</h6>
+                <h2 id="totalFindings">0</h2>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="row g-3 mb-4">
+
+    <div class="col-lg-3 col-md-6">
+        <div class="card border-danger shadow-sm">
+            <div class="card-body text-center">
+                <h6>MFA Disabled</h6>
+                <h2 id="mfaDisabled">0</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="card border-warning shadow-sm">
+            <div class="card-body text-center">
+                <h6>Admin Users</h6>
+                <h2 id="adminUsers">0</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="card border-danger shadow-sm">
+            <div class="card-body text-center">
+                <h6>Root Keys</h6>
+                <h2 id="rootKeys">0</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="card border-info shadow-sm">
+            <div class="card-body text-center">
+                <h6>Old Access Keys</h6>
+                <h2 id="oldAccessKeys">0</h2>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="card shadow-sm">
+
+    <div class="card-header d-flex justify-content-between align-items-center">
+
+        <h5 class="mb-0">
+            IAM Findings
+        </h5>
+
+        <input
+            id="searchInput"
+            class="form-control w-25"
+            placeholder="Search findings..."
+        >
+
+    </div>
+
+    <div class="card-body p-0">
+
+        <div class="table-responsive">
+
+            <table class="table table-hover table-striped mb-0">
+
+                <thead class="table-dark">
+
+                    <tr>
+
+                        <th>Severity</th>
+
+                        <th>Category</th>
+
+                        <th>Resource</th>
+
+                        <th>Finding</th>
+
+                        <th>Recommendation</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="iamTableBody">
+
+                    <tr>
+
+                        <td colspan="5" class="text-center text-muted py-5">
+
+                            Loading IAM findings...
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script src="{{ url_for('static', filename='js/iam.js') }}"></script>
+
+{% endblock %}

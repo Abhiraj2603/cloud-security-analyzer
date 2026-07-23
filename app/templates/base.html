@@ -31,42 +31,43 @@
         <ul class="menu">
 
             <li>
-                <a href="/dashboard">
+                <a href="{{ url_for('dashboard.dashboard') }}">
                     <i class="bi bi-speedometer2"></i>
                     Dashboard
                 </a>
             </li>
 
             <li>
-                <a href="#">
+                <a href="{{ url_for('security_groups.security_groups') }}">
                     <i class="bi bi-shield-lock"></i>
                     Security Groups
                 </a>
             </li>
 
+            <!-- FIXED IAM LINK -->
             <li>
-                <a href="#">
+                <a href="{{ url_for('iam.index') }}">
                     <i class="bi bi-person-badge"></i>
                     IAM
                 </a>
             </li>
 
             <li>
-                <a href="#">
+                <a href="{{ url_for('ec2.ec2') }}">
                     <i class="bi bi-hdd-network"></i>
                     EC2
                 </a>
             </li>
 
             <li>
-                <a href="#">
+                <a href="{{ url_for('s3.index') }}">
                     <i class="bi bi-bucket"></i>
                     S3
                 </a>
             </li>
 
             <li>
-                <a href="#">
+                <a href="{{ url_for('reports.index') }}">
                     <i class="bi bi-file-earmark-text"></i>
                     Reports
                 </a>
@@ -74,7 +75,7 @@
 
             {% if session.get("role") == "admin" %}
             <li>
-                <a href="/settings">
+                <a href="{{ url_for('settings.settings') }}">
                     <i class="bi bi-gear"></i>
                     Settings
                 </a>
@@ -85,10 +86,10 @@
 
     </aside>
 
-    <!-- Main -->
+    <!-- Main Content -->
     <main class="main-content">
 
-        <!-- Navbar -->
+        <!-- Top Navigation -->
         <nav class="topbar">
 
             <div>
@@ -101,9 +102,7 @@
 
                 <span class="text-muted">
                     Last Scan:
-                    <span id="lastScan">
-                        Never
-                    </span>
+                    <span id="lastScan">Never</span>
                 </span>
 
                 <button id="scanBtn" class="btn btn-primary">
@@ -140,12 +139,9 @@
                         <li><hr class="dropdown-divider"></li>
 
                         <li>
-                            <a class="dropdown-item"
-                               href="/logout">
-
+                            <a class="dropdown-item" href="{{ url_for('auth.logout') }}">
                                 <i class="bi bi-box-arrow-right"></i>
                                 Logout
-
                             </a>
                         </li>
 
@@ -159,8 +155,7 @@
 
         </nav>
 
-        <!-- Dynamic Content -->
-
+        <!-- Dynamic Page Content -->
         <div class="container-fluid mt-4">
 
             {% block content %}
